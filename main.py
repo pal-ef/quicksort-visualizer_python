@@ -11,27 +11,28 @@ icon = pg.image.load("icon.png")
 pg.display.set_caption("Quick Sort Visualizer")
 pg.display.set_icon(icon)
 
-# Useful constants
+# Useful
 midscreen = dimensions[0] // 2
-
-font = pg.font.SysFont('mono', 20, False)
+font = pg.font.SysFont('Arial', 20, True)
+clock = pg.time.Clock()
+black = (0, 0, 0)
+white = (255, 255, 255)
 
 # Background Surface
 background = pg.Surface(screen.get_size())
-background.fill((0, 0, 0))  # Fill with white
+background.fill(black)  # Fill with white
 background = background.convert()  # Optimize Alphas
 layer = pg.Surface(screen.get_size())
-
-
 
 # Blit
 screen.blit(background, (0, 0))
 
-clock = pg.time.Clock()
+
+# Visualizer mechanics
 
 
 # Main Loop
-def draw_text(text="placeholder", pos=(10, 10), color=(255, 255, 255)):
+def draw_text(text="placeholder", pos=(10, 10), color=white):
     surface = font.render(text, True, color)
     screen.blit(surface, pos)
 
@@ -44,43 +45,68 @@ def random_list():
 
 
 def draw_data(data_list):
-    salto = -3
+    space = -3
     for number in data_list:
-        salto += 15
-        pg.draw.rect(background, (255, 255, 255), [salto, 590, 12, -number])
-    # Rects
-    pg.draw.rect(background, (255, 255, 255), [0, 60, dimensions[0], 1])  # Separator
+        space += 15
+        pg.draw.rect(background, white, [space, 590, 12, -number])
+
+    # Rectangles
+    pg.draw.rect(background, white, [0, 60, dimensions[0], 1])  # Separator
 
     # Play Button
-    pg.draw.rect(background, (255, 255, 255), [dimensions[0] - 50, 15, 33, 31])
-    pg.draw.polygon(background, (0, 0, 0), ((760, 20), (760, 39), (775, 30)))
+    pg.draw.rect(background, white, [dimensions[0] - 50, 15, 33, 31])
+    pg.draw.polygon(background, black, ((760, 20), (760, 39), (775, 30)))
+
+
+def check(uncheck):
+    if uncheck:
+        return False
+    else:
+        return True
+
+
+def start_button():
+    mouse = pg.mouse.get_pos()
+    click = pg.mouse.get_pressed()
+
+    if 783 > mouse[0] > 750 and 50 > mouse[1] > 15:
+        pg.draw.rect(background, (200, 100, 0), [dimensions[0] - 52, 13, 37, 36])
+        if click[0] == 1:
+            check(True)
 
 
 def mainloop():
     looping = True
-    current_time = 0
     launch_time = 0
     first = True
+    not_started = check(False)
     while looping:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 looping = False
 
         current_time = pg.time.get_ticks()
-        draw_text("QUICKSORT ALGORITHM VISUALIZER | EFRAÍN GARCÍA PALACIOS", (20, 20))
+
+        draw_text("QUICKSORT ALGORITHM VISUALIZER", (20, 20))
         pg.display.flip()
-        clock.tick(60)
+
         if first:
             rl = random_list()
             first = False
             launch_time = pg.time.get_ticks()
         elif current_time - launch_time > 200:
-            rl = random_list()
-            launch_time = pg.time.get_ticks()
+            if not_started:
+                rl = random_list()
+                launch_time = pg.time.get_ticks()
+            else:
+                print("HEY IM HERE")
+
+        start_button()
         draw_data(rl)
         screen.blit(background, (0, 0))
-        background.fill((0, 0, 0))
-
+        background.fill(black)
+        clock.tick(60)
+        print(not_started)
 
     pg.quit()
 
